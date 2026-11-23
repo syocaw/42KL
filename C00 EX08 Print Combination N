@@ -1,0 +1,71 @@
+// C00 EX08 Print Combination N ($yocaw)
+// happy coding in 2026!
+
+#include <stdio.h>
+
+char	*fn_rc(char *arr, char n)					//return value is char *something, coz we need to return a pointer from this recursive function, youll see why :)
+{
+	if (*arr == n)							//checking every index to see if they are at the ceiling value of their index
+    	{ 
+        	//printf("sorting time baby !!! \n");
+		arr--;
+		arr = fn_rc(arr, n - 1);
+	}
+	
+	if (*arr < n)							
+        	*arr = *arr + 1;					//settling this base case index of incrementing (+1)
+        
+	else								//for all the subsequent index moving to the right, it will all be *arr = n, the ceiling value
+	{
+		arr--;
+		char	a = *arr;
+		arr++;
+		*arr = a + 1;						//basically following the rules of subsequent digits +1, e.g : 26789 > 34567
+	} 
+
+    	arr++;
+    	return arr;							//super improtant ! without return, the function doesnt remember the updated value of pointer arr
+}
+
+int	main()
+{
+	int	n=5;							//put your n value, (1<n<10)
+	char	arr[n+1];						//the extra one for null terminator
+    	char	maxVal[n+1];
+	int	i; 
+
+    	for ( i=0; i<(n); i++)						//making two arrays based on the n value
+	{
+        	arr[i]=i +'0';
+		maxVal[i]= (10+i-n)+ '0';
+	}
+
+        arr[i]='\0';
+	maxVal[i]='\0';
+
+        printf("start : %s\n", arr);
+        printf("end : %s\n", maxVal);
+
+    
+    	while (arr[0] <= (10-n)+ '0')						//using the first index as the limiter, 10-n is simply the ceiling value
+        {
+
+        	while (arr[n-1] == '9' && arr[0] != (maxVal[0]) )		//sorting it evrytime the last index hits full,important to use while instead of IF
+		{                         
+        		printf(",  %s", arr);	
+
+			fn_rc(&arr[n-1],'9');					//passing it the address of the index, important to use ampersand "&"
+		}
+
+        	printf(",  %s", arr);
+
+            	if (arr[0] == maxVal[0])					//the indicator that is the last number to be printed out
+                	break;
+            
+        	arr[n-1]++;							// we only need to handle the last index in the main loop
+        }
+    
+	return(0);
+}
+
+//end
