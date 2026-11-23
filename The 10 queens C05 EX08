@@ -1,0 +1,137 @@
+// THE 10 QUEENS ($yocaw)
+
+#include <stdio.h>
+
+int	FACTORY(char *arr, int remain, int n, int fac) 
+{
+	if (fac < remain)
+	{   
+		arr--;
+		remain = FACTORY(arr, remain, n+1, fac*(n+1) );
+		arr++;		// this is important, coz we are not passing in arr-- into the parameter, so when we bounce out from each function call, it doesnt automaticaly become arr++;
+	}
+   
+	*arr = remain / fac + '0';
+	remain = remain % fac;
+	return (remain);	//the only value we need this recursive function to remember after altering it
+}
+
+int	checkdiagonal(char *arr, int diagonal[], int x)
+{
+	int flag;
+	int sum;
+	int n = 0;
+	while (n < 10)  
+	{
+		flag = 0;
+		for (int i = 0; i <= 9; i++)
+		{
+			if (x == 1)
+				sum = (arr[i] - '0') + i;
+
+			if (x == 2)
+				sum = (arr[i] - '0') - i + 18;
+
+			if (sum == diagonal[n] )
+				flag++;
+		}
+
+		if(flag > 1)		//if its only 1, means theres no collision in the diagonals, anything more than 1 means collision
+			return (0);
+
+		n++;
+	}
+    return (1);
+}
+
+											
+int	main() 
+{
+	int	total = 0;
+	int	nb = 0;
+
+	while (nb < 3628800)		//factorial of 10= 10!
+	{
+		int i = 9;		//try not to touch this variable i, we use this as a universal tracking index
+    
+		char arr[i+2];		//have to set the size of this array
+    	
+		int k;
+		for (k = 0; k <= i; k++)	//filling the array up, necessary to prevent seg fault
+			arr[k] = '0';
+      
+		FACTORY( &arr[i], nb, 1, 1 ); 
+		//we set the pointer to i, pointing at the last element of the array. this function gives us the "Factory value", thnk of the factory value of a number
+		//like a binary, octal or hexadecimal value of a number in decimal, the goal is to then translate this value into the lexicographic representation of 
+		// "0123456789" later.
+
+
+		char arr2[] = "0123456789";		//10 numbers lexicographically
+		char arr3[] = "0000000000";		//the empty array waiting to be filled
+
+		int j, count, n;
+
+		for (k = 0; k < i; k++)
+		{ 
+			count = 0;
+			j = k+1;
+			n = 0;
+
+		while (arr[j] != count-1 +'0' )  //count-1 coz index is always one value behind 
+                {
+			if(arr2[n] != 'x')
+				count++;
+
+			n++;
+                }
+            
+		n--;
+		arr3[k] = arr2[n]; 
+		arr2[n] = 'x';		//since we dont have an arraylist in C, we cant remove elements, so this is what i did to mark an invalid index
+        }
+
+	//now we are at k=i , the final index to fill for arr3
+        for (n = 0; n <= i; n++)
+	{
+		if (arr2[n] != 'x') //the only one that hasnt been marked x is the last element
+                {
+			arr3[k] = arr2[n];
+			break;
+                } 
+	}
+
+        //testing both diagonals for collision, (northeast =  diagonal from bottom left to top right, south east = top left to bottom right)
+	//i use integer arrays coz some numbers are double digits that are being stored inside
+
+        int	northeast[10];  
+	int	southeast[10];
+
+        int	x;
+        for (x = 0; x < 11; x++)
+                northeast[x] = (arr3[x] - '0' ) + x; //northeast[] is the array of sum of values of each coordinates. (1,4) = 5, (0,9)=9 etc..
+        
+        int A = checkdiagonal(arr3 ,northeast, 1);
+
+        
+        for (x = 0; x < 11; x++)
+                southeast[x]= (arr3[x] -'0') - x + 18; //the formula i found that provides an indicator of whether or not it collides(in a line)
+
+        int B = checkdiagonal(arr3, southeast, 2);
+
+        
+	if (A == 1 && B == 1) //can also write if (A + B == 2 )
+            
+	{
+		total++;
+		printf("  (%d", total);
+		printf(") : %s", arr3);
+	}
+
+
+		nb++;
+	}
+    
+	return (0);
+}
+
+//end
